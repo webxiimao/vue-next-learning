@@ -1219,6 +1219,7 @@ function baseCreateRenderer(
         }
 
         if (next) {
+          // debugger
           updateComponentPreRender(instance, next, optimized)
         } else {
           next = vnode

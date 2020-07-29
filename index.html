@@ -9,11 +9,12 @@
 <body>
     <div id="app">
         <input type="text" @input="change" v-model="name">
-        <Child/>
+        <Child :name="name"/>
     </div>
     <script>
         const Child = {
-            template: '<div>{{title}}</div>',
+            template: '<div>{{name}}</div>',
+            props: ['name'],
             data() {
                 return {
                     title: 'hello'

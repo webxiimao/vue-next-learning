@@ -59,6 +59,7 @@ export function renderComponentRoot(
   }
   try {
     let fallthroughAttrs
+    debugger
     if (vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
       // withProxy is a proxy with a different `has` trap only for
       // runtime-compiled render functions using `with` block.
@@ -68,7 +69,7 @@ export function renderComponentRoot(
       )
       fallthroughAttrs = attrs
     } else {
-      // functional
+      // functional 函数式组件
       const render = Component as FunctionalComponent
       result = normalizeVNode(
         render.length > 1
