@@ -79,7 +79,6 @@ export function readonly<T extends object>(
     readonlyCollectionHandlers
   )
 }
-
 // Return a reactive-copy of the original object, where only the root level
 // properties are readonly, and does NOT unwrap refs nor recursively convert
 // returned properties.
@@ -126,6 +125,7 @@ function createReactiveObject(
     ? collectionHandlers
     : baseHandlers
   observed = new Proxy(target, handlers)
+  // xiimao 设置了是否重复reactive 和是否对一个proxy 多次reactive
   toProxy.set(target, observed)
   toRaw.set(observed, target)
   return observed
@@ -144,6 +144,11 @@ export function isProxy(value: unknown): boolean {
   return readonlyToRaw.has(value) || reactiveToRaw.has(value)
 }
 
+/**
+ * xiimao 判断当前对象
+ * 1. 是否是已读的
+ * @param observed obj
+ */
 export function toRaw<T>(observed: T): T {
   observed = readonlyToRaw.get(observed) || observed
   return reactiveToRaw.get(observed) || observed

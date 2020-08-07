@@ -301,7 +301,6 @@ export function setupComponent(
   const isStateful = shapeFlag & ShapeFlags.STATEFUL_COMPONENT
   initProps(instance, props, isStateful, isSSR)
   initSlots(instance, children)
-
   const setupResult = isStateful
     ? setupStatefulComponent(instance, isSSR)
     : undefined
@@ -309,6 +308,7 @@ export function setupComponent(
   return setupResult
 }
 
+// setup
 function setupStatefulComponent(
   instance: ComponentInternalInstance,
   isSSR: boolean
@@ -335,18 +335,25 @@ function setupStatefulComponent(
   // 0. create render proxy property access cache
   instance.accessCache = {}
   // 1. create public instance / render proxy
+  // xiimao 创建代理上下文
+  // xiimao  instance.ctx指向的就是this
   instance.proxy = new Proxy(instance.ctx, PublicInstanceProxyHandlers)
   if (__DEV__) {
     exposePropsOnRenderContext(instance)
   }
   // 2. call setup()
   const { setup } = Component
+  // xiimao 判断处理setup
   if (setup) {
+    console.log('setup', setup.length);
+    
+    // xiimao 判断setup是否有参数 Function.prototype.length 判断函数的参数
     const setupContext = (instance.setupContext =
       setup.length > 1 ? createSetupContext(instance) : null)
 
     currentInstance = instance
     pauseTracking()
+    // 执行setup方法，获取结果
     const setupResult = callWithErrorHandling(
       setup,
       instance,
@@ -355,7 +362,7 @@ function setupStatefulComponent(
     )
     resetTracking()
     currentInstance = null
-
+    // xiimao 如果结果是promise
     if (isPromise(setupResult)) {
       if (isSSR) {
         // return the promise so server-renderer can wait on it
@@ -373,6 +380,7 @@ function setupStatefulComponent(
         )
       }
     } else {
+      // xiimao 执行结果不是promise，处理结果
       handleSetupResult(instance, setupResult, isSSR)
     }
   } else {
@@ -397,6 +405,7 @@ export function handleSetupResult(
     }
     // setup returned bindings.
     // assuming a render function compiled from template is present.
+    // xiimao 创建setupState
     instance.setupState = reactive(setupResult)
     if (__DEV__) {
       exposeSetupStateOnRenderContext(instance)

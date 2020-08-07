@@ -59,7 +59,6 @@ export function renderComponentRoot(
   }
   try {
     let fallthroughAttrs
-    debugger
     if (vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
       // withProxy is a proxy with a different `has` trap only for
       // runtime-compiled render functions using `with` block.
@@ -200,7 +199,7 @@ const isElementRoot = (vnode: VNode) => {
     vnode.type === Comment // potential v-if branch switch
   )
 }
-
+// xiimao 是否应该更新组件
 export function shouldUpdateComponent(
   prevVNode: VNode,
   nextVNode: VNode,
@@ -224,6 +223,7 @@ export function shouldUpdateComponent(
   }
 
   // force child update for runtime directive or transition on component vnode.
+  // 强制组件更新
   if (nextVNode.dirs || nextVNode.transition) {
     return true
   }
@@ -238,6 +238,7 @@ export function shouldUpdateComponent(
       // presence of this flag indicates props are always non-null
       return hasPropsChanged(prevProps!, nextProps!)
     } else if (patchFlag & PatchFlags.PROPS) {
+      // xiimao dynamicProps父组件已传入的props，而不是定义的所有props
       const dynamicProps = nextVNode.dynamicProps!
       for (let i = 0; i < dynamicProps.length; i++) {
         const key = dynamicProps[i]

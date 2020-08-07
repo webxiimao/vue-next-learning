@@ -8,33 +8,67 @@
 </head>
 <body>
     <div id="app">
-        <input type="text" @input="change" v-model="name">
-        <Child :name="name"/>
+        <div>
+            <input type="text" @input="change" :value="state.name">
+        </div>
+        <div v-for="item in state.arr">{{ item }}</div>
+        <button @click="changeArr">点我爽</button>
+        <Child :hello="state.hello"/>
     </div>
     <script>
+        const { reactive, computed, watch } = Vue
         const Child = {
-            template: '<div>{{name}}</div>',
-            props: ['name'],
+            template: '<div>{{hello}}</div>',
+            props: ['hello'],
             data() {
                 return {
-                    title: 'hello'
+
                 }
             }
         }
         const App = {
-            data(){
+            // data(){
+            //     return {
+            //         name: '222',
+            //         hello: 'hello world!'
+            //     }
+            // },
+            setup(a, b){
+                const state = reactive({
+                    name: 'nick',
+                    hello: computed(() => 'hello ' + state.name),
+                    arr: ['s1', 's2', 's3'],
+                    obj: {
+                        info: {
+                            a: 1
+                        },
+                        status: 0
+                    }
+                })
+                console.log(state);
+                watch(() => {
+                    console.log(state.arr.indexOf('s1'));
+                })
+                const change = e => {
+                    state.name = e.target.value
+                }
+                const changeArr = () => {
+                    state.arr = ['s1']
+                }
                 return {
-                    name: '222'
+                    state,
+                    change,
+                    changeArr
                 }
             },
             components: {
                 Child
             },
-            methods: {
-                change(e){
-                    console.log(e.target.value);
-                }
-            }
+            // methods: {
+            //     change(e){
+            //         console.log(e.target.value);
+            //     }
+            // }
         }
         
         const app = Vue.createApp(App)

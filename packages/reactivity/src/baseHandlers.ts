@@ -18,14 +18,18 @@ const shallowReadonlyGet = /*#__PURE__*/ createGetter(true, true)
 const arrayInstrumentations: Record<string, Function> = {}
 ;['includes', 'indexOf', 'lastIndexOf'].forEach(key => {
   arrayInstrumentations[key] = function(...args: any[]): any {
+    // xiimao 获取源target
+    // xiimao 其中this表示响应式的target
     const arr = toRaw(this) as any
     for (let i = 0, l = (this as any).length; i < l; i++) {
+      // xiimao 触发响应式
       track(arr, TrackOpTypes.GET, i + '')
     }
     // we run the method using the original args first (which may be reactive)
     const res = arr[key](...args)
     if (res === -1 || res === false) {
       // if that didn't work, run it again using raw values.
+      // xiimao 有可能参数是个相应式的，所以使用源数据来跑
       return arr[key](...args.map(toRaw))
     } else {
       return res
@@ -37,6 +41,7 @@ function createGetter(isReadonly = false, shallow = false) {
   return function get(target: object, key: string | symbol, receiver: object) {
     const targetIsArray = isArray(target)
     if (targetIsArray && hasOwn(arrayInstrumentations, key)) {
+      // 数组的依赖收集
       return Reflect.get(arrayInstrumentations, key, receiver)
     }
     const res = Reflect.get(target, key, receiver)
@@ -59,13 +64,14 @@ function createGetter(isReadonly = false, shallow = false) {
         return res.value
       }
     }
-
+    // 依赖收集
     !isReadonly && track(target, TrackOpTypes.GET, key)
     return isObject(res)
       ? isReadonly
         ? // need to lazy access readonly and reactive here to avoid
           // circular dependency
           readonly(res)
+          // 递归依赖收集
         : reactive(res)
       : res
   }
@@ -84,6 +90,7 @@ function createSetter(shallow = false) {
     const oldValue = (target as any)[key]
     if (!shallow) {
       value = toRaw(value)
+      // xiimao ref的处理
       if (!isArray(target) && isRef(oldValue) && !isRef(value)) {
         oldValue.value = value
         return true
@@ -95,9 +102,11 @@ function createSetter(shallow = false) {
     const hadKey = hasOwn(target, key)
     const result = Reflect.set(target, key, value, receiver)
     // don't trigger if target is something up in the prototype chain of original
+    // xiimao 如果目标是原始原型链中的某个对象，请勿触发
     if (target === toRaw(receiver)) {
       if (!hadKey) {
         trigger(target, TriggerOpTypes.ADD, key, value)
+        // xiimao 性能优化，对比新旧属性
       } else if (hasChanged(value, oldValue)) {
         trigger(target, TriggerOpTypes.SET, key, value, oldValue)
       }

@@ -137,6 +137,7 @@ export function resetTracking() {
 }
 
 export function track(target: object, type: TrackOpTypes, key: unknown) {
+  // xiimao 开关，推测类似batch，批处理
   if (!shouldTrack || activeEffect === undefined) {
     return
   }

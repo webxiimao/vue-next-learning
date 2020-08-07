@@ -784,6 +784,7 @@ function baseCreateRenderer(
       )
     } else if (!optimized) {
       // full diff
+      // 完整的diff算法
       patchChildren(
         n1,
         n2,
@@ -1081,7 +1082,7 @@ function baseCreateRenderer(
       endMeasure(instance, `mount`)
     }
   }
-
+  // xiimao 更新组件
   const updateComponent = (
     n1: VNode,
     n2: VNode,
@@ -1110,6 +1111,7 @@ function baseCreateRenderer(
         instance.next = n2
         // in case the child component is also queued, remove it to avoid
         // double updating the same child component in the same flush.
+        // 用来防止子组件重复更新
         invalidateJob(instance.update)
         // instance.update is the reactive effect runner.
         instance.update()
@@ -1171,7 +1173,6 @@ function baseCreateRenderer(
           }
         } else {
           // xiimao 19.初始化还没有el 所以走这里
-          // debugger
           if (__DEV__) {
             startMeasure(instance, `patch`)
           }
@@ -1211,17 +1212,19 @@ function baseCreateRenderer(
       } else {
         // updateComponent
         // This is triggered by mutation of component's own state (next: null)
+        // xiimao 如果是当前组件更新 next为null
         // OR parent calling processComponent (next: VNode)
+        // 如果是父组件下发的props 的改变 则next指向更新后的vnode，vnode指向旧的vnode
         let { next, bu, u, parent, vnode } = instance
         let vnodeHook: VNodeHook | null | undefined
         if (__DEV__) {
           pushWarningContext(next || instance.vnode)
         }
-
+        // 如果是子组件更新直接更新子组件
         if (next) {
-          // debugger
           updateComponentPreRender(instance, next, optimized)
         } else {
+          // 当前组件更新 next还是vnode
           next = vnode
         }
         if (__DEV__) {
@@ -1231,6 +1234,7 @@ function baseCreateRenderer(
         if (__DEV__) {
           endMeasure(instance, `render`)
         }
+        // xiimao 交换subTree，只是在vnode抽象的更新
         const prevTree = instance.subTree
         instance.subTree = nextTree
         next.el = vnode.el
@@ -1250,12 +1254,15 @@ function baseCreateRenderer(
         if (__DEV__) {
           startMeasure(instance, `patch`)
         }
+        // xiimao 实际diff更新
         patch(
           prevTree,
           nextTree,
           // parent may have changed if it's in a teleport
+          // 如果在 teleport 组件中父节点可能已经改变，所以容器直接找旧树 DOM 元素的父节点
           hostParentNode(prevTree.el!)!,
           // anchor may have changed if it's in a fragment
+          // 参考节点在 fragment 的情况可能改变，所以直接找旧树 DOM 元素的下一个节点
           getNextHostNode(prevTree),
           instance,
           parentSuspense,
@@ -1288,6 +1295,7 @@ function baseCreateRenderer(
     }, __DEV__ ? createDevEffectOptions(instance) : prodEffectOptions)
   }
 
+  // 更新组件的函数
   const updateComponentPreRender = (
     instance: ComponentInternalInstance,
     nextVNode: VNode,
@@ -1300,6 +1308,7 @@ function baseCreateRenderer(
     updateSlots(instance, nextVNode.children)
   }
 
+  // diff
   const patchChildren: PatchChildrenFn = (
     n1,
     n2,

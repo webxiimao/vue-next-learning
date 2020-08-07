@@ -134,6 +134,7 @@ export const PublicInstanceProxyHandlers: ProxyHandler<any> = {
     // is the multiple hasOwn() calls. It's much faster to do a simple property
     // access on a plain object, so we use an accessCache object (with null
     // prototype) to memoize what access type a key corresponds to.
+    // xiimao 判断是不是$开头
     if (key[0] !== '$') {
       const n = accessCache![key]
       if (n !== undefined) {
