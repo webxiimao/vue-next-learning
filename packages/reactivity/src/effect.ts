@@ -85,6 +85,7 @@ function createReactiveEffect<T = any>(
     if (!effect.active) {
       return options.scheduler ? undefined : fn(...args)
     }
+    // 去掉重复的effect
     if (!effectStack.includes(effect)) {
       cleanup(effect)
       try {
