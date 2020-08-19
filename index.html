@@ -18,11 +18,15 @@
     <script>
         const { reactive, computed, watch } = Vue
         const Child = {
-            template: '<div>{{hello}}</div>',
+            template: '<div>{{state.hello2}}</div>',
             props: ['hello'],
-            data() {
+            setup(props){
+                // console.log(props.hello);
+                
                 return {
-
+                    state: {
+                        hello2: computed(() => props.hello)
+                    }
                 }
             }
         }
@@ -44,10 +48,6 @@
                         },
                         status: 0
                     }
-                })
-                console.log(state);
-                watch(() => {
-                    console.log(state.arr.indexOf('s1'));
                 })
                 const change = e => {
                     state.name = e.target.value
