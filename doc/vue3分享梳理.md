@@ -22,7 +22,7 @@
   
   - 只diff动态节点
 
-#### vue3 组件渲染
+#### vue3 组件渲染(不重要可以不讲)
 
 - 创建vnode -> 渲染vnode -> 创建dom
 
@@ -34,7 +34,13 @@
 
 - diff
 
+#### Composition Api
+
+- 更方便逻辑复用
+
 #### vue3 reactive库
+
+
 
 
 
